@@ -1,0 +1,19 @@
+# Ignore downloaded model repository (large files)
+models/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+venv/
+.venv/
+.env
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Logs and PIDs
+*.log
+*.pid
