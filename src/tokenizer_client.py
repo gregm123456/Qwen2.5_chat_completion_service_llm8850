@@ -82,10 +82,17 @@ class TokenizerClient:
                 timeout=self.timeout
             )
             response.raise_for_status()
-            
-            data = response.json()
-            return data.get("tokens", [])
-        
+
+            try:
+                data = response.json()
+            except ValueError:
+                # Non-JSON reply (legacy tokenizer) - log and raise
+                logger.error("Tokenizer encode returned non-JSON response")
+                raise TokenizerError("Tokenizer returned non-JSON response for encode")
+
+            # Accept either 'tokens' or legacy 'token_ids'
+            return data.get("tokens") or data.get("token_ids") or []
+
         except requests.RequestException as e:
             logger.error(f"Tokenizer encode failed: {e}")
             raise TokenizerError(f"Failed to encode text: {e}")
@@ -109,10 +116,16 @@ class TokenizerClient:
                 timeout=self.timeout
             )
             response.raise_for_status()
-            
-            data = response.json()
-            return data.get("text", "")
-        
+
+            try:
+                data = response.json()
+            except ValueError:
+                logger.error("Tokenizer decode returned non-JSON response")
+                raise TokenizerError("Tokenizer returned non-JSON response for decode")
+
+            # Accept either 'text' or legacy field
+            return data.get("text") or data.get("decoded", "")
+
         except requests.RequestException as e:
             logger.error(f"Tokenizer decode failed: {e}")
             raise TokenizerError(f"Failed to decode tokens: {e}")
@@ -145,10 +158,16 @@ class TokenizerClient:
                 timeout=self.timeout
             )
             response.raise_for_status()
-            
-            data = response.json()
+
+            try:
+                data = response.json()
+            except ValueError:
+                # Non-JSON or empty response from tokenizer; raise a TokenizerError so caller can fall back
+                logger.error("Tokenizer chat_template returned non-JSON response")
+                raise TokenizerError("Tokenizer returned non-JSON response for chat_template")
+
             return data.get("prompt", "")
-        
+
         except requests.RequestException as e:
             logger.error(f"Tokenizer chat template application failed: {e}")
             raise TokenizerError(f"Failed to apply chat template: {e}")

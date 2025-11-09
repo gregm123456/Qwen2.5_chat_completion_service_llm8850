@@ -178,56 +178,75 @@ class ModelManager:
             raise ModelError("Model is not ready")
         
         try:
-            # Clear the output queue
+            # Drain any stray output before sending the new prompt
             while not self._output_queue.empty():
                 try:
                     self._output_queue.get_nowait()
                 except Empty:
                     break
-            
+
             # Send prompt to stdin
             logger.debug(f"Sending prompt to model: {prompt[:100]}...")
-            self.process.stdin.write(prompt + "\n")
+            self.process.stdin.write(prompt.rstrip() + "\n")
             self.process.stdin.flush()
-            
-            # Collect response
+
+            # Collect response lines until we detect the interactive prompt again
             response_lines = []
             timeout = self.config.model_request_timeout
             start_time = time.time()
-            got_response = False
-            
+
             while time.time() - start_time < timeout:
                 try:
                     line = self._output_queue.get(timeout=0.5)
-                    
-                    # Skip ANSI escape codes and progress bars
-                    clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line)
-                    clean_line = clean_line.strip()
-                    
-                    # Check for prompt (end of response)
-                    if clean_line.endswith('>>'):
-                        got_response = True
-                        break
-                    
-                    # Collect non-empty lines that look like response
-                    if clean_line and not clean_line.startswith('[') and '|' not in clean_line:
-                        response_lines.append(clean_line)
-                        
                 except Empty:
-                    # If we got some response and there's a pause, consider it done
-                    if response_lines and time.time() - start_time > 2:
-                        got_response = True
+                    # If we've seen some content and there's a pause, assume response done
+                    if response_lines and time.time() - start_time > 1.5:
                         break
                     continue
-            
-            if not got_response and not response_lines:
+
+                # Strip ANSI escapes and whitespace
+                clean_line = re.sub(r'\x1b\[[0-9;]*m', '', line).strip()
+                if not clean_line:
+                    continue
+
+                # Skip obvious progress/status lines
+                if clean_line.startswith('[') and ']' in clean_line:
+                    continue
+                if '|' in clean_line and '%' in clean_line:
+                    # progress bar line like ' 12% | ...'
+                    continue
+
+                # If the model prints a prompt marker (e.g. '>>' or '>> ' or repeating > chars),
+                # treat that as end-of-response and stop collecting.
+                if re.fullmatch(r'^(>\s*)+$', clean_line) or clean_line == '>>':
+                    break
+
+                # If line begins with '>>', strip leading prompt markers
+                if clean_line.startswith('>>'):
+                    content = re.sub(r'^(>\s*)+', '', clean_line).strip()
+                else:
+                    content = clean_line
+
+                # Avoid collecting lines that look like echoes of the prompt we sent
+                # (simple heuristic: if content equals the first 120 chars of prompt, skip)
+                prompt_sample = prompt.strip()[:120]
+                if content and prompt_sample and content == prompt_sample:
+                    continue
+
+                # De-duplicate consecutive identical lines
+                if response_lines and response_lines[-1] == content:
+                    continue
+
+                response_lines.append(content)
+
+            if not response_lines:
                 logger.error("Generation timeout - no response received")
                 return None
-            
+
             response = '\n'.join(response_lines).strip()
-            logger.debug(f"Model response: {response[:100]}...")
+            logger.debug(f"Model response: {response[:200]}...")
             return response
-            
+
         except Exception as e:
             logger.error(f"Error during generation: {e}")
             raise ModelError(f"Generation failed: {e}")
