@@ -1,4 +1,4 @@
-.PHONY: help install download-model test run clean dev lint format
+.PHONY: help install download-model test run clean clean-npu dev lint format
 
 # Default target
 help:
@@ -18,6 +18,7 @@ help:
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  make clean           - Remove cache files and logs"
+	@echo "  make clean-npu       - Force cleanup of NPU device (use when stuck)"
 	@echo "  make clean-all       - Remove everything including venv and models"
 	@echo ""
 	@echo "Production:"
@@ -78,6 +79,12 @@ clean:
 	find . -type f -name "*.log" -delete
 	find . -type f -name "*.pid" -delete
 	@echo "✓ Cleanup complete"
+
+clean-npu:
+	@echo "⚠️  Force cleaning NPU device (requires sudo)..."
+	@bash scripts/cleanup_npu.sh
+	@echo "✓ NPU cleanup complete"
+	@echo "You can now restart the service with: make dev"
 
 clean-all: clean
 	@echo "Removing virtual environment..."

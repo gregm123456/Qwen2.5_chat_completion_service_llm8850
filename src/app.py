@@ -124,8 +124,8 @@ async def create_chat_completion(request: ChatCompletionRequest):
                 detail="Streaming is not supported"
             )
         
-        # Convert messages to dict format
-        messages = [msg.dict() for msg in request.messages]
+        # Convert request messages to chat completion format
+        messages = [msg.model_dump() for msg in request.messages]
         
         # Validate messages
         if not validate_messages(messages):

@@ -157,8 +157,7 @@ def chat_completion(
             temperature=temperature,
             top_k=top_k,
             top_p=top_p,
-            max_tokens=max_tokens,
-            repeat_penalty=repeat_penalty
+            max_tokens=max_tokens
         )
         
         logger.info(f"Generated completion: {len(generated_text)} chars")
