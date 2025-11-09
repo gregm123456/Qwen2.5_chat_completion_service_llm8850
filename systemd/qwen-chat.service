@@ -1,0 +1,40 @@
+[Unit]
+Description=Qwen2.5 Chat Completion Service
+Documentation=https://github.com/gregm123456/Qwen2.5_chat_completion_service_llm8850
+After=network.target
+
+[Service]
+Type=simple
+User=robot
+Group=robot
+WorkingDirectory=/home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850
+
+# Environment setup
+Environment="PATH=/home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+EnvironmentFile=-/etc/profile
+
+# Start the FastAPI service
+ExecStart=/home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850/venv/bin/python src/app.py
+
+# Restart policy
+Restart=on-failure
+RestartSec=10s
+StartLimitInterval=5min
+StartLimitBurst=3
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=qwen-chat
+
+# Security hardening (optional, adjust as needed)
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Resource limits (adjust as needed)
+LimitNOFILE=65536
+TimeoutStartSec=300s
+TimeoutStopSec=30s
+
+[Install]
+WantedBy=multi-user.target

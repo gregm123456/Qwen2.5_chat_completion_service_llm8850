@@ -1,0 +1,59 @@
+# Qwen2.5 Chat Completion Service Configuration
+# Default settings for Raspberry Pi 5 (Bookworm)
+
+service:
+  # API HTTP server settings
+  host: "127.0.0.1"  # Bind to loopback only by default
+  port: 8080
+  workers: 1  # Single worker for simplicity with NPU
+
+paths:
+  # Installation paths (configurable for dev vs production)
+  install_root: "/opt/qwen"  # Use /home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850 for dev
+  model_repo: "models/Qwen2.5-1.5B-Instruct-GPTQ-Int4"  # Relative to project root
+  log_dir: "/var/log/qwen"  # Logs directory
+  run_dir: "/run/qwen"  # PID files and sockets
+
+tokenizer:
+  # Tokenizer server settings
+  host: "127.0.0.1"
+  port: 12345
+  script: "qwen2.5_tokenizer.py"  # Script name in model repo
+  pid_file: "/run/qwen/tokenizer.pid"
+  log_file: "/var/log/qwen/tokenizer.log"
+  startup_timeout: 30  # seconds to wait for tokenizer to be ready
+  health_check_interval: 10  # seconds between health checks
+
+model:
+  # Model process settings
+  name: "qwen2.5-1.5b-instruct"
+  runner_script: "run_qwen2.5_1.5b_gptq_int4_axcl_aarch64.sh"  # Script name in model repo
+  
+  # IPC settings - prefer Unix domain socket
+  ipc_type: "socket"  # "socket" or "tcp" 
+  socket_path: "/run/qwen/model.sock"  # Unix domain socket (preferred)
+  tcp_host: "127.0.0.1"  # TCP fallback
+  tcp_port: 11411  # TCP fallback port
+  
+  pid_file: "/run/qwen/model.pid"
+  log_file: "/var/log/qwen/model.log"
+  startup_timeout: 60  # seconds to wait for model to load
+  request_timeout: 30  # seconds to wait for model response
+  
+  # Model generation defaults
+  default_temperature: 0.7
+  default_top_k: 40
+  default_top_p: 0.9
+  default_max_tokens: 512
+  default_repeat_penalty: 1.1
+
+logging:
+  # Service logging
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "/var/log/qwen/service.log"
+
+user:
+  # System user for production deployment
+  name: "qwen"
+  home: "/var/lib/qwen"
