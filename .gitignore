@@ -2,7 +2,7 @@
 models/
 
 # Runtime directories
-logs/
+# logs/
 run/
 
 # Python

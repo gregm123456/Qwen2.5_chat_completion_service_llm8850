@@ -1,0 +1,44 @@
+nohup: ignoring input
+INFO:     Started server process [10930]
+INFO:     Waiting for application startup.
+2025-11-09 08:35:58,171 - __main__ - INFO - Starting Qwen2.5 Chat Completion Service...
+2025-11-09 08:35:58,171 - __main__ - INFO - Configuration loaded from /home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850/config/config.yaml
+2025-11-09 08:35:58,171 - tokenizer_client - INFO - TokenizerClient initialized with base_url=http://127.0.0.1:12345
+2025-11-09 08:35:58,171 - tokenizer_manager - INFO - TokenizerManager initialized
+2025-11-09 08:35:58,171 - __main__ - INFO - Starting tokenizer server...
+2025-11-09 08:35:58,171 - tokenizer_manager - INFO - Starting tokenizer server: /home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850/venv/bin/python /home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850/models/Qwen2.5-1.5B-Instruct-GPTQ-Int4/qwen2.5_tokenizer.py --port 12345 --host 127.0.0.1
+2025-11-09 08:35:58,172 - tokenizer_manager - INFO - Tokenizer server started with PID 10938
+2025-11-09 08:35:58,172 - tokenizer_manager - INFO - Waiting for tokenizer server to be ready (timeout: 30s)
+2025-11-09 08:35:58,177 - urllib3.connectionpool - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fff96a1c310>: Failed to establish a new connection: [Errno 111] Connection refused')': /health
+2025-11-09 08:35:59,180 - urllib3.connectionpool - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fff96a1cf50>: Failed to establish a new connection: [Errno 111] Connection refused')': /health
+2025-11-09 08:36:01,181 - urllib3.connectionpool - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fff96a1dbd0>: Failed to establish a new connection: [Errno 111] Connection refused')': /health
+2025-11-09 08:36:01,184 - tokenizer_client - WARNING - Tokenizer health check failed: HTTPConnectionPool(host='127.0.0.1', port=12345): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fff96a1e850>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-11-09 08:36:02,189 - tokenizer_manager - INFO - Tokenizer server is ready
+2025-11-09 08:36:02,189 - model_manager - INFO - ModelManager initialized (stdin/stdout mode)
+2025-11-09 08:36:02,190 - __main__ - INFO - Starting model process...
+2025-11-09 08:36:02,190 - model_manager - INFO - Starting model process (with /etc/profile sourced)
+2025-11-09 08:36:02,191 - model_manager - INFO - Model process started with PID 10968
+2025-11-09 08:36:02,196 - model_manager - INFO - Waiting for model to be ready (timeout: 60s)
+2025-11-09 08:36:20,320 - model_manager - INFO - Model initialization complete
+2025-11-09 08:36:20,820 - model_manager - INFO - Model is ready
+2025-11-09 08:36:20,820 - __main__ - INFO - Service startup complete
+2025-11-09 08:36:20,821 - __main__ - INFO - API server listening on 127.0.0.1:8080
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+2025-11-09 08:37:45,029 - chat_completion - INFO - Processing chat completion request with 1 messages
+2025-11-09 08:37:45,030 - tokenizer_client - INFO - TokenizerClient initialized with base_url=http://127.0.0.1:12345
+2025-11-09 08:37:45,036 - tokenizer_client - ERROR - Tokenizer chat_template returned non-JSON response
+2025-11-09 08:37:45,036 - chat_completion - WARNING - Tokenizer chat template failed, using local fallback: Tokenizer returned non-JSON response for chat_template
+2025-11-09 08:37:48,232 - chat_completion - INFO - Generated completion: 9 chars
+INFO:     127.0.0.1:47672 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-11-09 09:34:01,365 - __main__ - INFO - Shutting down Qwen2.5 Chat Completion Service...
+2025-11-09 09:34:01,365 - model_manager - INFO - Stopping model process (PID 10968)
+2025-11-09 09:34:04,368 - model_manager - WARNING - Graceful shutdown timeout, forcing termination
+2025-11-09 09:34:04,374 - model_manager - INFO - Model process group terminated
+2025-11-09 09:34:04,875 - tokenizer_manager - INFO - Stopping tokenizer server (PID 10938)
+2025-11-09 09:34:04,882 - tokenizer_manager - INFO - Tokenizer server stopped gracefully
+2025-11-09 09:34:04,883 - __main__ - INFO - Service shutdown complete
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10930]
