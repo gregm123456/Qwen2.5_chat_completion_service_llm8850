@@ -67,10 +67,11 @@ class ModelManager:
             if socket_path.exists():
                 socket_path.unlink()
         
-        # Build command to run model
-        cmd = ["bash", str(script_path)]
+        # Build command to run model - source /etc/profile first to get NPU environment
+        # We wrap the script execution in a shell that sources /etc/profile first
+        cmd = ["bash", "-c", f"source /etc/profile 2>/dev/null; bash {script_path}"]
         
-        logger.info(f"Starting model process: {' '.join(cmd)}")
+        logger.info(f"Starting model process (with /etc/profile sourced)")
         logger.warning("Note: The model runner script may need to be modified to expose an RPC interface")
         logger.warning("Currently assuming the script will be enhanced with socket/TCP listener capability")
         

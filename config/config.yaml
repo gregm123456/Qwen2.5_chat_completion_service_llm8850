@@ -11,16 +11,16 @@ paths:
   # Installation paths (configurable for dev vs production)
   install_root: "/opt/qwen"  # Use /home/robot/llm8850/Qwen2.5_chat_completion_service_llm8850 for dev
   model_repo: "models/Qwen2.5-1.5B-Instruct-GPTQ-Int4"  # Relative to project root
-  log_dir: "/var/log/qwen"  # Logs directory
-  run_dir: "/run/qwen"  # PID files and sockets
+  log_dir: "logs"  # Logs directory (relative to project root for dev)
+  run_dir: "run"  # PID files and sockets (relative to project root for dev)
 
 tokenizer:
   # Tokenizer server settings
   host: "127.0.0.1"
   port: 12345
   script: "qwen2.5_tokenizer.py"  # Script name in model repo
-  pid_file: "/run/qwen/tokenizer.pid"
-  log_file: "/var/log/qwen/tokenizer.log"
+  pid_file: "run/tokenizer.pid"
+  log_file: "logs/tokenizer.log"
   startup_timeout: 30  # seconds to wait for tokenizer to be ready
   health_check_interval: 10  # seconds between health checks
 
@@ -31,12 +31,12 @@ model:
   
   # IPC settings - prefer Unix domain socket
   ipc_type: "socket"  # "socket" or "tcp" 
-  socket_path: "/run/qwen/model.sock"  # Unix domain socket (preferred)
+  socket_path: "run/model.sock"  # Unix domain socket (preferred)
   tcp_host: "127.0.0.1"  # TCP fallback
   tcp_port: 11411  # TCP fallback port
   
-  pid_file: "/run/qwen/model.pid"
-  log_file: "/var/log/qwen/model.log"
+  pid_file: "run/model.pid"
+  log_file: "logs/model.log"
   startup_timeout: 60  # seconds to wait for model to load
   request_timeout: 30  # seconds to wait for model response
   
@@ -51,7 +51,7 @@ logging:
   # Service logging
   level: "INFO"  # DEBUG, INFO, WARNING, ERROR
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  file: "/var/log/qwen/service.log"
+  file: "logs/service.log"
 
 user:
   # System user for production deployment

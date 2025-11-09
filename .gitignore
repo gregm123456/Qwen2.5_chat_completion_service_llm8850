@@ -1,6 +1,10 @@
 # Ignore downloaded model repository (large files)
 models/
 
+# Runtime directories
+logs/
+run/
+
 # Python
 __pycache__/
 *.py[cod]
