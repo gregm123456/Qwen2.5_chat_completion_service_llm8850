@@ -350,6 +350,27 @@ black src/
 - Verify user has permissions to access NPU device
 - Check model binaries exist and are executable
 
+### NPU cleanup (if `axcl-smi` hangs or shows no card data)
+
+If the NPU appears locked (empty `axcl-smi` output or repeated driver errors in `dmesg`), run the repository cleanup which attempts to stop the model and release the device:
+
+```bash
+# stop the service (if running)
+pkill -f "python src/app.py" || true
+
+# run the project cleanup (requires sudo for some steps)
+make clean-npu
+
+# if your terminal looks broken after a hang, restore it with:
+stty sane
+```
+
+If the problem persists after `make clean-npu`, reboot the host to fully reinitialize the PCI/firmware state:
+
+```bash
+sudo reboot
+```
+
 ### API returns 503 errors
 
 - Service is starting but model/tokenizer not ready yet
